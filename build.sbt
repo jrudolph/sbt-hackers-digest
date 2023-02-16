@@ -1,7 +1,6 @@
 
 name := """sbt-hackers-digest"""
-organization := "net.virtualvoid"
-version := "0.1-SNAPSHOT"
+organization := "net.virtual-void"
 
 sbtPlugin := true
 

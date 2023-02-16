@@ -1,5 +1,6 @@
 package net.virtualvoid.hackersdigest
 
+import java.io.File
 import xsbti.Severity
 
 class GithubActionCompileReporter(delegate: xsbti.Reporter, baseDir: File) extends xsbti.Reporter {

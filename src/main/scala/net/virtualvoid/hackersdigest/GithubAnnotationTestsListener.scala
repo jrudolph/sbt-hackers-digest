@@ -18,11 +18,17 @@ class GithubAnnotationTestsListener(baseDir: File, sourceDirs: Seq[File]) extend
       failed.foreach { t =>
         if (t.throwable().isDefined) {
           val throwable = t.throwable().get()
-          val ele       = getRelevantTraceElement(throwable.getStackTrace)
           val firstLine = throwable.getMessage.split("\n").head
-          println(
-            s"::error file=${findFile(ele.getFileName).getOrElse(ele.getFileName)},line=${ele.getLineNumber}::$firstLine"
-          )
+          TestStackTraceInfoExtractor.mostRelevantTraceElement(throwable.getStackTrace) match {
+            case Some(ele) =>
+              println(
+                s"::error file=${findFile(ele.getFileName).getOrElse(ele.getFileName)},line=${ele.getLineNumber}::$firstLine"
+              )
+            case None =>
+              println(
+                s"::error::$firstLine"
+              )
+          }
         }
       }
     }
@@ -38,9 +44,6 @@ class GithubAnnotationTestsListener(baseDir: File, sourceDirs: Seq[File]) extend
 
     sourceDirs.filter(_.exists()).flatMap(findIn(_)).headOption
   }
-
-  private def getRelevantTraceElement(stackTrace: Array[StackTraceElement]): StackTraceElement =
-    stackTrace.takeWhile(!_.getClassName.endsWith("OutcomeOf")).last
 
   override def endGroup(name: String, t: Throwable): Unit = println("::endgroup::")
 

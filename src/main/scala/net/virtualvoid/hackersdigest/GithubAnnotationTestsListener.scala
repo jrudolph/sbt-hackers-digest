@@ -5,7 +5,7 @@ import sbt.testing.Status
 
 import java.nio.file.{Files, Path}
 
-class GithubAnnotationTestsListener(baseDir: File, sourceDirs: Seq[File]) extends TestsListener {
+class GithubAnnotationTestsListener(annotator: Annotator, baseDir: File, sourceDirs: Seq[File]) extends TestsListener {
   override def doInit(): Unit = ()
 
   override def doComplete(finalResult: TestResult): Unit = ()
@@ -18,16 +18,12 @@ class GithubAnnotationTestsListener(baseDir: File, sourceDirs: Seq[File]) extend
       failed.foreach { t =>
         if (t.throwable().isDefined) {
           val throwable = t.throwable().get()
-          val firstLine = throwable.getMessage.split("\n").head
+          val summary = throwable.getMessage.split("\n").head
           TestStackTraceInfoExtractor.mostRelevantTraceElement(throwable.getStackTrace) match {
             case Some(ele) =>
-              println(
-                s"::error file=${findFile(ele.getFileName).getOrElse(ele.getFileName)},line=${ele.getLineNumber}::$firstLine"
-              )
+              annotator.error(AnnotationOrigin.Testing, summary, findFile(ele.getFileName).map(_.toString).getOrElse(ele.getFileName), ele.getLineNumber)
             case None =>
-              println(
-                s"::error::$firstLine"
-              )
+              annotator.error(AnnotationOrigin.Testing, summary)
           }
         }
       }

@@ -3,7 +3,7 @@ package net.virtualvoid.hackersdigest
 import java.io.File
 import xsbti.Severity
 
-class GithubActionCompileReporter(delegate: xsbti.Reporter, baseDir: File) extends xsbti.Reporter {
+class GithubActionCompileReporter(annotator: Annotator, delegate: xsbti.Reporter, baseDir: File) extends xsbti.Reporter {
   def reset(): Unit                  = delegate.reset()
   def hasErrors: Boolean             = delegate.hasErrors
   def hasWarnings: Boolean           = delegate.hasWarnings
@@ -21,13 +21,13 @@ class GithubActionCompileReporter(delegate: xsbti.Reporter, baseDir: File) exten
         value.map[String](v => s",$key=$v").orElse("")
 
       val level = severity match {
-        case Severity.Warn  => "warning"
-        case Severity.Error => "error"
+        case Severity.Warn  => AnnotationSeverity.Warning
+        case Severity.Error => AnnotationSeverity.Error
         case _              => throw new IllegalStateException
       }
-      println(
-        s"::$level file=${file}${e("line", position.line())}${e("col", position.startColumn())}${e("endColumn", position.endColumn())}}::$message"
-      )
+      // TODO: resurrect column info: ${e("col", position.startColumn())}${e("endColumn", position.endColumn())}
+      val line = if (position().line().isPresent) Some(position().line().get().intValue()) else None
+      annotator.createAnnotation(AnnotationOrigin.Compilation, level, message, Some(file.toString), line)
     }
   }
 

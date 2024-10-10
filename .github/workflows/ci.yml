@@ -16,4 +16,4 @@ jobs:
         java-version: 8
         distribution: temurin
     - uses: sbt/setup-sbt@v1
-    - run: sbt test scripted
+    - run: sbt scalafmtSbtCheck scalafmtCheckAll test scripted

@@ -3,7 +3,8 @@ package net.virtualvoid.hackersdigest
 import java.io.File
 import xsbti.Severity
 
-class GithubActionCompileReporter(annotator: Annotator, delegate: xsbti.Reporter, baseDir: File) extends xsbti.Reporter {
+class GithubActionCompileReporter(annotator: Annotator, delegate: xsbti.Reporter, baseDir: File)
+    extends xsbti.Reporter {
   def reset(): Unit                  = delegate.reset()
   def hasErrors: Boolean             = delegate.hasErrors
   def hasWarnings: Boolean           = delegate.hasWarnings

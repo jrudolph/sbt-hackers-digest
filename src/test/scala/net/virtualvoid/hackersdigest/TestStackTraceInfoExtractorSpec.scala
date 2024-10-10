@@ -35,7 +35,8 @@ class TestStackTraceInfoExtractorSpec extends AnyFreeSpec with Matchers {
             |at org.scalatest.SuperEngine.runTestsInBranch(Engine.scala:390)
             |at org.scalatest.SuperEngine.traverseSubNodes$2$$anonfun$1(Engine.scala:427)
             |at scala.runtime.function.JProcedure1.apply(JProcedure1.java:15)
-            |at scala.runtime.function.JProcedure1.apply(JProcedure1.java:10)""".stripMargin)
+            |at scala.runtime.function.JProcedure1.apply(JProcedure1.java:10)""".stripMargin
+        )
 
         val relevant = TestStackTraceInfoExtractor.mostRelevantTraceElement(trace).get
         relevant.getFileName mustEqual "MailboxSelectorSpec.scala"
@@ -71,15 +72,15 @@ class TestStackTraceInfoExtractorSpec extends AnyFreeSpec with Matchers {
             |at org.scalatest.SuperEngine.runTestsInBranch(Engine.scala:390)
             |at org.scalatest.SuperEngine.traverseSubNodes$2$$anonfun$1(Engine.scala:427)
             |at scala.runtime.function.JProcedure1.apply(JProcedure1.java:15)
-            |at scala.runtime.function.JProcedure1.apply(JProcedure1.java:10)""".stripMargin)
+            |at scala.runtime.function.JProcedure1.apply(JProcedure1.java:10)""".stripMargin
+        )
 
         val relevant = TestStackTraceInfoExtractor.mostRelevantTraceElement(trace).get
         relevant.getFileName mustEqual "MailboxSelectorSpec.scala"
         relevant.getLineNumber mustBe 75
       }
       "user code on top of anonymous function (nested tests)" in {
-        val trace = stackTrace(
-          """at scala.Predef$.assert(Predef.scala:279)
+        val trace = stackTrace("""at scala.Predef$.assert(Predef.scala:279)
             |at org.apache.pekko.testkit.TestKitBase.$anonfun$receiveN_internal$1(TestKit.scala:852)
             |at org.apache.pekko.testkit.TestKitBase.$anonfun$receiveN_internal$1$adapted(TestKit.scala:849)
             |at scala.collection.immutable.Range.map(Range.scala:59)
@@ -115,10 +116,10 @@ class TestStackTraceInfoExtractorSpec extends AnyFreeSpec with Matchers {
 
   val TraceLineR = """at (.+)\.([^(]+)\(([^:]+):([^)]+)\)""".r
   def stackTrace(stackTrace: String): Array[StackTraceElement] = {
-    stackTrace.split("\n")
-      .map {
-      case TraceLineR(className, methodName, fileName, lineNumber) =>
-          new StackTraceElement(className, methodName, fileName, lineNumber.toInt)
-    }
+    stackTrace
+      .split("\n")
+      .map { case TraceLineR(className, methodName, fileName, lineNumber) =>
+        new StackTraceElement(className, methodName, fileName, lineNumber.toInt)
+      }
   }
 }

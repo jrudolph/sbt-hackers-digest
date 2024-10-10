@@ -18,10 +18,15 @@ class GithubAnnotationTestsListener(annotator: Annotator, baseDir: File, sourceD
       failed.foreach { t =>
         if (t.throwable().isDefined) {
           val throwable = t.throwable().get()
-          val summary = throwable.getMessage.split("\n").head
+          val summary   = throwable.getMessage.split("\n").head
           TestStackTraceInfoExtractor.mostRelevantTraceElement(throwable.getStackTrace) match {
             case Some(ele) =>
-              annotator.error(AnnotationOrigin.Testing, summary, findFile(ele.getFileName).map(_.toString).getOrElse(ele.getFileName), ele.getLineNumber)
+              annotator.error(
+                AnnotationOrigin.Testing,
+                summary,
+                findFile(ele.getFileName).map(_.toString).getOrElse(ele.getFileName),
+                ele.getLineNumber
+              )
             case None =>
               annotator.error(AnnotationOrigin.Testing, summary)
           }

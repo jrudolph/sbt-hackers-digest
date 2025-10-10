@@ -15,9 +15,12 @@ class GithubActionCompileReporter(annotator: Annotator, delegate: xsbti.Reporter
     delegate.log(problem)
     import problem._
 
-    if ((severity == Severity.Warn || severity == Severity.Error) && position.sourceFile.isPresent) {
-      val file    = baseDir.toPath.relativize(position.sourceFile.get().toPath).toFile
-      val message = problem.message.split("\n").head
+    if (
+      (severity == Severity.Warn || severity == Severity.Error) && position.sourceFile.isPresent && position.sourceFile
+        .get()
+        .toPath
+        .getRoot != null
+    ) {
       def e(key: String, value: java.util.Optional[Integer]): String =
         value.map[String](v => s",$key=$v").orElse("")
 
@@ -27,7 +30,9 @@ class GithubActionCompileReporter(annotator: Annotator, delegate: xsbti.Reporter
         case _              => throw new IllegalStateException
       }
       // TODO: resurrect column info: ${e("col", position.startColumn())}${e("endColumn", position.endColumn())}
-      val line = if (position().line().isPresent) Some(position().line().get().intValue()) else None
+      val message = problem.message.split("\n").head
+      val file    = baseDir.toPath.relativize(position.sourceFile.get().toPath).toFile
+      val line    = if (position.line.isPresent) Some(position.line.get().intValue) else None
       annotator.createAnnotation(AnnotationOrigin.Compilation, level, message, Some(file.toString), line)
     }
   }
